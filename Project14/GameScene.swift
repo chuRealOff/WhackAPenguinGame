@@ -11,6 +11,7 @@ class GameScene: SKScene {
     
     var slots = [WhackSlot]()
     var gameScore: SKLabelNode!
+    var finalScore: SKLabelNode!
     
     var popupTime = 0.85
     var numRounds = 0
@@ -35,6 +36,13 @@ class GameScene: SKScene {
         gameScore.fontSize = 48
         addChild(gameScore)
         
+        finalScore = SKLabelNode()
+        finalScore.fontName = "Arial"
+        finalScore.zPosition = 1
+        finalScore.position = CGPoint(x: 512, y: 300)
+        finalScore.horizontalAlignmentMode = .center
+        finalScore.fontSize = 35
+            
         for i in 0 ..< 5 { createSlot(at: CGPoint(x: 100 + (i * 170), y: 410)) }
         for i in 0 ..< 4 { createSlot(at: CGPoint(x: 180 + (i * 170), y: 320)) }
         for i in 0 ..< 5 { createSlot(at: CGPoint(x: 100 + (i * 170), y: 230)) }
@@ -55,6 +63,12 @@ class GameScene: SKScene {
             if !whackSlot.isVisible { continue }
             if whackSlot.isHit { continue }
             whackSlot.hit()
+            
+            if let smokeParticles = SKEmitterNode(fileNamed: "Smoke") {
+                smokeParticles.position = whackSlot.position
+                smokeParticles.particleAction?.duration = 1
+                addChild(smokeParticles)
+            }
             
             if node.name == "charFriend" {
                 score -= 5
@@ -90,6 +104,11 @@ class GameScene: SKScene {
             gameOver.position = CGPoint(x: 512, y: 384)
             gameOver.zPosition = 1
             addChild(gameOver)
+            
+            run(SKAction.playSoundFileNamed("Game Over.m4a", waitForCompletion: false))
+            
+            finalScore.text = "Final score: \(score)"
+            addChild(finalScore)
 
             return
         }
